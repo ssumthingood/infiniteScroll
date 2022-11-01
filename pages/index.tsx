@@ -41,15 +41,18 @@ const Home: NextPage = () => {
             // getNextPageParam 메서드가 falsy한 값을 반환하면 추가 fetch를 실행하지 않는다
             // falsy하지 않은 값을 return 할 경우 Number를 리턴해야 하며
             // 위의 fetch callback의 인자로 자동으로 pageParam을 전달.
-            getNextPageParam: (lastPage, page) => {
+            getNextPageParam: (lastPage) => {
                 const { next } = lastPage; // PoKeApi는 마지막 데이터가 없으면 next를 null로 준다
+                console.log(next);
 
                 // 마지막페이지 fetchNextPage가 더는 작동하지 않도록 false를 리턴하자
-                if (!next) return false;
-
+                if (next === null) {
+                    return false;
+                } else {
+                    return Number(new URL(next).searchParams.get("offset"));
+                }
                 // next 값에서 URL주소를 주고 있기 때문에 필요한 offset만 빼와서
                 // getPokemonList 함수에 pageParam으로 넘겨주자.
-                return Number(new URL(next).searchParams.get("offset"));
             },
         },
     );
