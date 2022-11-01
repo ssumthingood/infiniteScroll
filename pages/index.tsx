@@ -2,6 +2,7 @@ import axios from "axios";
 import type { NextPage } from "next";
 import { useEffect, useRef } from "react";
 import { useInfiniteQuery } from "react-query";
+import { useObserver } from "../libs/useObserver";
 
 // const OFFSET = 30; // 나중에 편하게 바꿀 수 있도록 page offset을 상수로 설정
 const OFFSET = 0;
@@ -15,13 +16,15 @@ const getPokemonList = ({ pageParam = OFFSET }) =>
             // url전체를 템플릿 리터럴로 넘기든 config의 params로 넘기든 취향에 맞게 넘기자.
             params: {
                 // limit: OFFSET,
-                limit: 30,
+                limit: 50,
                 offset: pageParam,
             },
         })
         .then((res) => res?.data);
 
 const Home: NextPage = () => {
+    const bottom = useRef(null);
+
     const {
         data, // 💡 data.pages를 갖고 있는 배열
         error, // error 객체
@@ -39,14 +42,27 @@ const Home: NextPage = () => {
             // falsy하지 않은 값을 return 할 경우 Number를 리턴해야 하며
             // 위의 fetch callback의 인자로 자동으로 pageParam을 전달.
             getNextPageParam: (lastPage, page) => {
-                const { next } = lastPage;
+                const { next } = lastPage; // PoKeApi는 마지막 데이터가 없으면 next를 null로 준다
+
+                // 마지막페이지 fetchNextPage가 더는 작동하지 않도록 false를 리턴하자
                 if (!next) return false;
 
-                const offset = new URL(next).searchParams.get("offset");
-                return Number(offset);
+                // next 값에서 URL주소를 주고 있기 때문에 필요한 offset만 빼와서
+                // getPokemonList 함수에 pageParam으로 넘겨주자.
+                return Number(new URL(next).searchParams.get("offset"));
             },
         },
     );
+
+    // useObserver로 넘겨줄 callback, entry로 넘어오는 HTMLElement가
+    // isIntersecting이라면 무한 스크롤을 위한 fetchNextPage가 실행될 것이다.
+    const onIntersect = ([entry]) => entry.isIntersecting && fetchNextPage();
+
+    // useObserver로 bottom ref와 onIntersect를 넘겨 주자.
+    useObserver({
+        target: bottom,
+        onIntersect,
+    });
 
     return (
         <div>
@@ -66,8 +82,12 @@ const Home: NextPage = () => {
                     </div>
                 ))}
             {/* // 스크롤 구현 전까지 테스트로 사용할 임시 버튼 */}
-            <button onClick={() => fetchNextPage()}>더 불러오기</button>
+            {/* <button onClick={() => fetchNextPage()}>더 불러오기</button> */}
             {/* // skeleton이나 화면 spinner로 로딩 만드는 것도 좋을 것 같다. */}
+
+            {/* // 아까 만들었던 더 불러오기 버튼을 제거하고 
+            // 바닥 ref를 위한 div를 하나 만들어준다. */}
+            <div ref={bottom} />
             {isFetchingNextPage && <p>계속 불러오는 중</p>}
         </div>
     );
