@@ -1,6 +1,6 @@
 import axios from "axios";
 import type { NextPage } from "next";
-import { useEffect, useRef } from "react";
+import { JSXElementConstructor, Key, ReactElement, ReactFragment, useEffect, useRef } from "react";
 import { useInfiniteQuery } from "react-query";
 import { useObserver } from "../libs/useObserver";
 
@@ -59,7 +59,7 @@ const Home: NextPage = () => {
 
     // useObserver로 넘겨줄 callback, entry로 넘어오는 HTMLElement가
     // isIntersecting이라면 무한 스크롤을 위한 fetchNextPage가 실행될 것이다.
-    const onIntersect = ([entry]) => entry.isIntersecting && fetchNextPage();
+    const onIntersect = ([entry]: any) => entry.isIntersecting && fetchNextPage();
 
     // useObserver로 bottom ref와 onIntersect를 넘겨 주자.
     useObserver({
