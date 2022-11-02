@@ -47,7 +47,7 @@ const Home: NextPage = () => {
 
                 // 마지막페이지 fetchNextPage가 더는 작동하지 않도록 false를 리턴하자
                 if (next === null) {
-                    return false;
+                    return undefined;
                 } else {
                     return Number(new URL(next).searchParams.get("offset"));
                 }
