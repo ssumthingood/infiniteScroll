@@ -2,6 +2,7 @@ import axios from "axios";
 import type { NextPage } from "next";
 import { JSXElementConstructor, Key, ReactElement, ReactFragment, useEffect, useRef } from "react";
 import { useInfiniteQuery } from "react-query";
+import PokemonCard from "../components/PokemonCard";
 import { useObserver } from "../libs/useObserver";
 
 // const OFFSET = 30; // 나중에 편하게 바꿀 수 있도록 page offset을 상수로 설정
@@ -79,9 +80,12 @@ const Home: NextPage = () => {
                     // group을 map으로 한번 더 돌리는 이중 배열 구조이다.
                     // PoKeApi는 특별한 고유 값이 없기에 key는 적당히 넣어준다.
                     <div key={index}>
-                        {group.results.map((pokemon) => (
-                            <p key={pokemon.name}>{pokemon.name}</p>
-                        ))}
+                        {group.results.map((pokemon) => {
+                            const { name, url } = pokemon;
+                            const id = url.split("/")[6];
+
+                            return <PokemonCard key={name} id={id} name={name} />;
+                        })}
                     </div>
                 ))}
             {/* // 스크롤 구현 전까지 테스트로 사용할 임시 버튼 */}
