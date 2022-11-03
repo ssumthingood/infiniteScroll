@@ -2,6 +2,7 @@ import axios from "axios";
 import type { NextPage } from "next";
 import { JSXElementConstructor, Key, ReactElement, ReactFragment, useEffect, useRef } from "react";
 import { useInfiniteQuery } from "react-query";
+// import useLocalStorage from "use-local-storage";
 import PokemonCard from "../components/PokemonCard";
 import { useObserver } from "../libs/useObserver";
 
@@ -23,7 +24,15 @@ const getPokemonList = ({ pageParam = OFFSET }) =>
         .then((res) => res?.data);
 
 const Home: NextPage = () => {
+    // const scrollY = localStorage.getItem("poke_list_scroll");
     const bottom = useRef(null);
+
+    useEffect(() => {
+        // 기본값이 "0"이기 때문에 스크롤 값이 저장됐을 때에만 window를 스크롤시킨다.
+        // if (scrollY !== 0) window.scrollTo(0, Number(scrollY));
+        const scrollY = localStorage.getItem("poke_list_scroll");
+        if (scrollY !== "0") window.scrollTo(0, Number(scrollY));
+    }, []);
 
     const {
         data, // 💡 data.pages를 갖고 있는 배열
@@ -65,13 +74,16 @@ const Home: NextPage = () => {
     useObserver({
         target: bottom,
         onIntersect,
+        root: null,
+        rootMargin: "",
+        threshold: 0.1,
     });
 
     return (
         <div>
             {/* // status에 따라서 화면을 달리한다. (사실 이렇게 안하고 다짜고자 data를 보면 터진다) // 단순한 문구가 재미없다면 skeleton을 따로 만들어서 로딩으로 사용하는 것도 추천 */}
             {status === "loading" && <p>불러오는 중</p>}
-            {status === "error" && <p>{error.message}</p>}
+            {status === "error" && <p>{error!.toString()}</p>}
             {/* // 추가로 success일 경우에만 data를 들여다 보도록 하자. */}
             {status === "success" &&
                 data.pages.map((group, index) => (
