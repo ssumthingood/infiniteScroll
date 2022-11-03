@@ -1,8 +1,8 @@
 import axios from "axios";
 import type { NextPage } from "next";
-import { JSXElementConstructor, Key, ReactElement, ReactFragment, useEffect, useRef } from "react";
+import { JSXElementConstructor, Key, ReactElement, ReactFragment, useEffect, useRef, useState } from "react";
 import { useInfiniteQuery } from "react-query";
-// import useLocalStorage from "use-local-storage";
+import useLocalStorage from "use-local-storage";
 import PokemonCard from "../components/PokemonCard";
 import { useObserver } from "../libs/useObserver";
 
@@ -26,13 +26,7 @@ const getPokemonList = ({ pageParam = OFFSET }) =>
 const Home: NextPage = () => {
     // const scrollY = localStorage.getItem("poke_list_scroll");
     const bottom = useRef(null);
-
-    useEffect(() => {
-        // 기본값이 "0"이기 때문에 스크롤 값이 저장됐을 때에만 window를 스크롤시킨다.
-        // if (scrollY !== 0) window.scrollTo(0, Number(scrollY));
-        const scrollY = localStorage.getItem("poke_list_scroll");
-        if (scrollY !== "0") window.scrollTo(0, Number(scrollY));
-    }, []);
+    const [scrollY] = useLocalStorage("poke_list_scroll", "0");
 
     const {
         data, // 💡 data.pages를 갖고 있는 배열
@@ -78,6 +72,14 @@ const Home: NextPage = () => {
         rootMargin: "",
         threshold: 0.1,
     });
+
+    useEffect(() => {
+        // 기본값이 "0"이기 때문에 스크롤 값이 저장됐을 때에만 window를 스크롤시킨다.
+        if (scrollY !== "0") {
+            window.scrollTo(0, Number(scrollY));
+        }
+        // if (scrollY !== "0")
+    }, [scrollY]);
 
     return (
         <div>

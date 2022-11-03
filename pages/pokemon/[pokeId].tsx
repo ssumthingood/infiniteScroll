@@ -1,4 +1,5 @@
 import axios from "axios";
+import { Key, ReactElement, JSXElementConstructor, ReactFragment, ReactPortal } from "react";
 
 const Pokemon = ({ data }: any) => {
     const { name, types, id, base_experience, abilities, order } = data;
@@ -29,19 +30,32 @@ const Pokemon = ({ data }: any) => {
                     </div>
                     <div>
                         <p>타입</p>
-                        {types.map((item) => (
-                            <span key={item.slot}>{item.type.name} </span>
-                        ))}
+                        {types.map(
+                            (item: {
+                                slot: Key | null | undefined;
+                                type: { name: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | ReactFragment | ReactPortal | null | undefined };
+                            }) => (
+                                <span key={item.slot}>{item.type.name} </span>
+                            ),
+                        )}
                     </div>
 
                     <div>
                         <p>특성</p>
-                        {abilities.map((item, index) => (
-                            <span key={item.slot}>
-                                {item.ability.name}
-                                {abilities.length !== index + 1 ? ", " : ""}
-                            </span>
-                        ))}
+                        {abilities.map(
+                            (
+                                item: {
+                                    slot: Key | null | undefined;
+                                    ability: { name: string | number | boolean | ReactFragment | ReactPortal | ReactElement<any, string | JSXElementConstructor<any>> | null | undefined };
+                                },
+                                index: number,
+                            ) => (
+                                <span key={item.slot}>
+                                    {item.ability.name}
+                                    {abilities.length !== index + 1 ? ", " : ""}
+                                </span>
+                            ),
+                        )}
                     </div>
                 </div>
             </div>
